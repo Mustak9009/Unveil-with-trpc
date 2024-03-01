@@ -1,0 +1,29 @@
+import { MaxWidthWrapper } from "./MaxWidthWrapper.component";
+import Link from 'next/link'
+import {LoginLink, RegisterLink} from '@kinde-oss/kinde-auth-nextjs/server';
+import { buttonVariants } from "./ui/button";
+import { ArrowRight } from "lucide-react";
+export default function NavBar() {
+  return (
+    <nav className="sticky inset-x-0 top-0 h-14 w-full z-30 border-b border-gray-200 bg-white/75 backdrop-blur-lg transition-all">
+      <MaxWidthWrapper className="h-full">
+        <div className="flex items-center justify-between border-b border-zinc-200 h-full">
+          <Link href={'/'} className="flex font-semibold z-40 text-xl sm:text-2xl">
+            <span>Quill.</span>
+          </Link>
+          {/* TODO: Add navBar for mobo */}
+          <div className="hidden sm:flex items-center space-x-4">
+            <>
+              <Link href={'/pricing'} className={buttonVariants({variant:'ghost',size:'sm'})}>Pricing</Link>
+              <LoginLink className={buttonVariants({variant:'ghost',size:'sm'})}>Sign in</LoginLink>
+              <RegisterLink className={buttonVariants({size:'sm'})}>
+                Get started
+                <ArrowRight className="ml-1.5 size-5"/>
+              </RegisterLink>
+            </>
+          </div>
+        </div>
+      </MaxWidthWrapper>
+    </nav>
+  );
+}
