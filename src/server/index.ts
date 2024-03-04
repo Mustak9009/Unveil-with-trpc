@@ -4,10 +4,10 @@ import { TRPCError } from '@trpc/server';
 export const appRouter = router({
   authCallBack:publicProcedure.query(async ()=>{
     const {getUser} = getKindeServerSession();
-    const user =  getUser();
+    const user =  await getUser();
     if(!user?.id || !user.email) throw new TRPCError({code:'UNAUTHORIZED'})
     
-    return {sucess:true}
+    return {success:true}
   })
 });
 
