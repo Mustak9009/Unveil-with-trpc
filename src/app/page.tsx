@@ -15,7 +15,7 @@ export default function Home() {
       <MaxWidthWrapper className="flex flex-col justify-center items-center text-center mb-12 mt-28 sm:mt-40">
         <div className="flex max-w-fit items-center justify-center mx-auto mb-4 space-x-2 overflow-hidden border border-gray-200 bg-white rounded-full px-7 py-2 shadow-md backdrop-blur transition-all hover:border-gray-300 hover:bg-white/50">
           <p className="text-sm font-semibold text-gray-700">
-            Quill is now public!
+            Unveil is now public!
           </p>
         </div>
         <section className="flex flex-col justify-center items-center text-center">
@@ -24,7 +24,7 @@ export default function Home() {
             second.
           </h1>
           <p className="max-w-prose text-zinc-500 sm:text-lg mt-5">
-            Quill allows you to have conversations with any PDF document. Simply
+            Unveil  allows you to have conversations with any PDF document. Simply
             upload your file and start asking questions right away.
           </p>
         </section>

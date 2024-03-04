@@ -9,7 +9,7 @@ export default function NavBar() {
       <MaxWidthWrapper className="h-full">
         <div className="flex items-center justify-between border-b border-zinc-200 h-full">
           <Link href={'/'} className="flex font-semibold z-40 text-xl sm:text-2xl">
-            <span>Quill.</span>
+            <span>Unveil.</span>
           </Link>
           {/* TODO: Add navBar for mobo */}
           <div className="hidden sm:flex items-center space-x-4">
