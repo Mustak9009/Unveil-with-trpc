@@ -18,17 +18,17 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="light">
-      <body
-        className={cn(
-          "min-h-screen font-sans antialiased rounded grainy",
-          inter.className
-        )}
-      >
-        <Provider>
+      <Provider>
+        <body
+          className={cn(
+            "min-h-screen font-sans antialiased rounded grainy",
+            inter.className
+          )}
+        >
           <NavBar />
           {children}
-        </Provider>
-      </body>
+        </body>
+      </Provider>
     </html>
   );
 }
