@@ -12,10 +12,10 @@ export default  function page() {
     if(error?.data?.code === 'UNAUTHORIZED'){
       router.push('/sign-in')
     }
-  },[error,router])
-  if(data?.success){
-    router.push(origin ? `/${origin}` : '/admin')
-  }
+    if(data?.success){
+      router.push(origin ? `/${origin}` : '/admin')
+    }
+  },[data,error,router])
   return(
     <div className="w-full mt-24 flex justify-center">
       <div className="flex flex-col items-center gap-2 ">
