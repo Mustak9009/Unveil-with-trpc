@@ -18,7 +18,7 @@ export default function NavBar() {
               <LoginLink className={buttonVariants({variant:'ghost',size:'sm'})}>Sign in</LoginLink>
               <RegisterLink className={buttonVariants({size:'sm'})}>
                 Get started
-                <ArrowRight className="ml-1.5 size-5"/>
+                <ArrowRight className="ml-1.5 w-5 h-5"/> 
               </RegisterLink>
             </>
           </div>

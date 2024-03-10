@@ -1,14 +1,27 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import Link from 'next/link';
 import {format} from 'date-fns'
 import { trpc } from "@/trpc/client";
-import { Ghost, MessageSquare, Plus, Trash } from "lucide-react";
+import { Button } from "./ui/button";
 import Skeleton from "react-loading-skeleton";
 import UploadButton from "@/components/UploadButton.component";
-import { Button } from "./ui/button";
+import { Ghost, Loader2, MessageSquare, Plus, Trash } from "lucide-react";
 export default function Dashboard() {
+  const utils = trpc.useUtils()
+  const [currentDelitingFile,setCurrentDelitingFile] = useState<string | null>(null)
   const { data: files, isLoading } = trpc.getUserFiles.useQuery();
+  const {mutate:deleteFile} = trpc.deleteFile.useMutation({
+    onSuccess:()=>{
+        utils.getUserFiles.invalidate()
+    },
+    onMutate:({id})=>{
+      setCurrentDelitingFile(id)
+    },
+    onSettled(){ //We are also write like this
+      setCurrentDelitingFile(null)
+    }
+  });
   return (
     <main className="max-w-7xl mx-auto md:p-10 px-3 sm:px-0">
       <div className="flex flex-col justify-between items-start gap-4 border-b border-gray-200 pb-5 mt-8 sm:flex-row sm:items-center sm:gap-0">
@@ -45,8 +58,12 @@ export default function Dashboard() {
                     <MessageSquare className="w-4 h-4"/>
                     <span>Mocked</span>
                   </div>
-                  <Button size={'sm'} className="w-full" variant={'destructive'}  aria-label="Delete" >
-                    <Trash className="w-4 h-4"/>
+                  <Button onClick={()=>deleteFile({id:file.id})} size={'sm'}  className="w-full" variant={'destructive'}  aria-label="Delete" >
+                    {currentDelitingFile !== file.id ? (
+                      <Trash className="w-4 h-4"/>
+                    ) : (
+                      <Loader2 className="w-4 h-4 animate-spin text-inherit"/>
+                    )}
                   </Button>
                 </div>
               </li>
