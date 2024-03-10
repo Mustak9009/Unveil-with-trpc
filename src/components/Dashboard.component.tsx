@@ -23,7 +23,7 @@ export default function Dashboard() {
     }
   });
   return (
-    <main className="max-w-7xl mx-auto md:p-10 px-3 sm:px-0">
+    <main className="max-w-7xl mx-auto md:p-10 px-3">
       <div className="flex flex-col justify-between items-start gap-4 border-b border-gray-200 pb-5 mt-8 sm:flex-row sm:items-center sm:gap-0">
         <h1 className="text-5xl font-bold mb-3 text-gray-900">My Files</h1>
         <UploadButton />
@@ -44,7 +44,7 @@ export default function Dashboard() {
                       <div className="flex-shrink-0 rounded-full bg-gradient-to-r from-[#28313B] to-[#485461] h-10 w-10" aria-hidden/>
                       <div className="flex-1 truncate">
                         <div className="flex items-center space-y-3">
-                           <h3 className="font-medium text-lg truncate">{file.name}</h3>
+                           <h3 className="font-medium text-lg truncate hover:underline">{file.name}</h3>
                         </div>
                       </div>
                   </div>
