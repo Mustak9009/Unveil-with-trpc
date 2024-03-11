@@ -1,12 +1,37 @@
 "use client";
-import React from "react";
-import {Dialog,DialogTrigger,DialogContent} from '@/components/ui/dialog';
+import React, { useState } from "react";
 import { Button } from "./ui/button";
 import DropZone from 'react-dropzone';
 import { Cloud,File } from "lucide-react";
+import {Progress} from '@/components/ui/progress';
+import {Dialog,DialogTrigger,DialogContent} from '@/components/ui/dialog';
 const UploadDropZone = () =>{
+  const [isUploading,setIsUploading] = useState<boolean>(false);
+  const [uploadingProgress,setUploadingProgress] = useState<number>(0);
+
+  const startSimulatedProgress = ()=>{
+    const interval = setInterval(()=>{
+      setUploadingProgress((preProgress)=>{
+        if(preProgress >= 95){
+          clearInterval(interval);
+          return preProgress;
+        }
+        return preProgress + 5;
+      })
+    },500);
+    return interval;
+  }
   return(
-    <DropZone multiple={false} onDrop={(acceptedFile)=>console.log(acceptedFile)}>
+    <DropZone multiple={false} onDrop={async(acceptedFile)=>{
+      setIsUploading(true);
+      //Hnadeling file uploading
+
+      const progressInterval = startSimulatedProgress();
+   
+
+      clearInterval(progressInterval);
+      setUploadingProgress(100);
+    }}>
       {({getRootProps,getInputProps,acceptedFiles})=>(
         <div {...getRootProps()} className="h-64 m-4 border border-dashed border-gray-300 rounded-lg">
           <div className="flex justify-center items-center h-full w-full">
@@ -21,13 +46,18 @@ const UploadDropZone = () =>{
               {acceptedFiles && acceptedFiles[0] ? (
                 <div className="max-w-xs bg-white flex items-center rounded-md overflow-hidden outline outline-1 outline-zinc-200 divide-x divide-zinc-200">
                   <div className="px-3 py-2 h-full grid place-items-center">
-                    <File className="h-4 w-4 text-blue-500"/>
+                    <File className="h-4 w-4"/>
                   </div>
                   <p className="px-3 py-2 h-full text-sm truncate">
                    {acceptedFiles[0].name}
                   </p>
                 </div>
               ):null}
+              {isUploading ? (
+                <div className="max-w-xs mx-auto w-full mt-4">
+                  <Progress value={uploadingProgress} className="h-1 w-full bg-zinc-200"/>
+                </div>
+              ) : null}
             </label>
           </div>
         </div>
