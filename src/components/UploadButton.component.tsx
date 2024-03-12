@@ -3,12 +3,15 @@ import React, { useState } from "react";
 import { Button } from "./ui/button";
 import DropZone from 'react-dropzone';
 import { Cloud,File } from "lucide-react";
-import {Progress} from '@/components/ui/progress';
-import {Dialog,DialogTrigger,DialogContent} from '@/components/ui/dialog';
+import {Progress} from './ui/progress';
+import {Dialog,DialogTrigger,DialogContent} from './ui/dialog';
+import {useUploadThing} from '@/lib/uploadthing';
+import { toast } from "./ui/use-toast";
+import {ToastAction} from './ui/toast'
 const UploadDropZone = () =>{
   const [isUploading,setIsUploading] = useState<boolean>(false);
   const [uploadingProgress,setUploadingProgress] = useState<number>(0);
-
+  const {startUpload,} = useUploadThing('pdfUpLoader')
   const startSimulatedProgress = ()=>{
     const interval = setInterval(()=>{
       setUploadingProgress((preProgress)=>{
@@ -21,17 +24,26 @@ const UploadDropZone = () =>{
     },500);
     return interval;
   }
+  const onDropHandler = async (acceptedFile:File[]) =>{
+    setIsUploading(true);
+    //Hnadeling file uploading
+
+    const progressInterval = startSimulatedProgress();
+    const res = await startUpload(acceptedFile);
+    if(!res){
+      return toast({
+        title:'Uh oh! Something went wrong.',
+        description:'There was a problem with your request.',
+        variant:'destructive',
+        action: <ToastAction altText="Try again">Try again</ToastAction>
+      })
+    }
+    
+    clearInterval(progressInterval);
+    setUploadingProgress(100);
+  }
   return(
-    <DropZone multiple={false} onDrop={async(acceptedFile)=>{
-      setIsUploading(true);
-      //Hnadeling file uploading
-
-      const progressInterval = startSimulatedProgress();
-   
-
-      clearInterval(progressInterval);
-      setUploadingProgress(100);
-    }}>
+    <DropZone multiple={false} onDrop={acceptedFile=>onDropHandler(acceptedFile)}>
       {({getRootProps,getInputProps,acceptedFiles})=>(
         <div {...getRootProps()} className="h-64 m-4 border border-dashed border-gray-300 rounded-lg">
           <div className="flex justify-center items-center h-full w-full">
