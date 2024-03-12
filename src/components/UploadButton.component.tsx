@@ -31,7 +31,7 @@ const UploadDropZone = () => {
 
     const progressInterval = startSimulatedProgress();
     const res = await startUpload(acceptedFile);
-    if (!res)
+    if (!res) //I'ts not a good idea
       return ShowToast({
         title: "Uh oh! Something went wrong.",
         description: "There was a problem with your request.",
