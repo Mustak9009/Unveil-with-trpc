@@ -6,8 +6,8 @@ import { Cloud, File } from "lucide-react";
 import { Progress } from "./ui/progress";
 import { Dialog, DialogTrigger, DialogContent } from "./ui/dialog";
 import { useUploadThing } from "@/lib/uploadthing";
-import { ShowToast } from "@/lib/Toast";
 import { ToastAction } from "./ui/toast";
+import { toast } from "./ui/use-toast";
 
 const UploadDropZone = () => {
   const [isUploading, setIsUploading] = useState<boolean>(false);
@@ -31,8 +31,8 @@ const UploadDropZone = () => {
 
     const progressInterval = startSimulatedProgress();
     const res = await startUpload(acceptedFile);
-    if (!res) //I'ts not a good idea
-      return ShowToast({
+    if (!res)
+      return toast({
         title: "Uh oh! Something went wrong.",
         description: "There was a problem with your request.",
         action: <ToastAction altText="Try again">Try again</ToastAction>,
@@ -43,7 +43,7 @@ const UploadDropZone = () => {
     console.log(res);
     const key = fileResponse.key;
     if (!key)
-      return ShowToast({
+      return toast({
         title: "Uh oh! Something went wrong.",
         description: "There was a problem with your request.",
         action: <ToastAction altText="Try again">Try again</ToastAction>,
