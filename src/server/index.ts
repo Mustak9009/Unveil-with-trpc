@@ -52,15 +52,32 @@ export const appRouter = router({
           ],
         },
       });
-      if(!file) throw new TRPCError({code:"NOT_FOUND"});
+      if (!file) throw new TRPCError({ code: "NOT_FOUND" });
       await db.file.delete({
-        where:{
-          id:input.id
-        }
-      })
+        where: {
+          id: input.id,
+        },
+      });
       return {
-        sucess:true
-      }
+        sucess: true,
+      };
+    }),
+  getFile: privateProcedure
+    .input(
+      z.object({
+        key: z.string(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { userId } = ctx;
+      const file = await db.file.findFirst({
+        where: {
+          userId,
+          key: input.key,
+        },
+      });
+      if (!file) throw new TRPCError({ code: "NOT_FOUND" });
+      return file;
     }),
 });
 

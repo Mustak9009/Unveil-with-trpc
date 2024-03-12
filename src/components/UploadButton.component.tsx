@@ -8,11 +8,19 @@ import { Dialog, DialogTrigger, DialogContent } from "./ui/dialog";
 import { useUploadThing } from "@/lib/uploadthing";
 import { ToastAction } from "./ui/toast";
 import { toast } from "./ui/use-toast";
+import { trpc } from "@/trpc/client";
+import {useRouter} from 'next/navigation';
 
 const UploadDropZone = () => {
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const [uploadingProgress, setUploadingProgress] = useState<number>(0);
   const { startUpload } = useUploadThing("pdfUpLoader");
+  const router = useRouter();
+  const {mutate:startPolling} = trpc.getFile.useMutation({
+    onSuccess:(file)=>{
+      router.push(`/admin/${file.id}`);
+    }
+  })
   const startSimulatedProgress = () => {
     const interval = setInterval(() => {
       setUploadingProgress((preProgress) => {
@@ -52,6 +60,7 @@ const UploadDropZone = () => {
 
     clearInterval(progressInterval);
     setUploadingProgress(100);
+    startPolling({key})
   };
   return (
     <DropZone
@@ -94,6 +103,7 @@ const UploadDropZone = () => {
                   />
                 </div>
               ) : null}
+              <input {...getInputProps()} type="file" id="dropzone-file" className="hidden" accept="application/pdf"/>
             </label>
           </div>
         </div>
