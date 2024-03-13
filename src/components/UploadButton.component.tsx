@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { Button } from "./ui/button";
 import DropZone from "react-dropzone";
-import { Cloud, File } from "lucide-react";
+import { Cloud, File, Loader2 } from "lucide-react";
 import { Progress } from "./ui/progress";
 import { Dialog, DialogTrigger, DialogContent } from "./ui/dialog";
 import { useUploadThing } from "@/lib/uploadthing";
@@ -16,7 +16,8 @@ const UploadDropZone = () => {
   const [uploadingProgress, setUploadingProgress] = useState<number>(0);
   const { startUpload } = useUploadThing("pdfUpLoader");
   const router = useRouter();
-  const { mutate: startPolling } = trpc.getFile.useMutation({ //Api polling
+  const { mutate: startPolling } = trpc.getFile.useMutation({
+    //Api polling
     onSuccess: (file) => {
       router.push(`/admin/${file.id}`);
     },
@@ -100,8 +101,15 @@ const UploadDropZone = () => {
                 <div className="max-w-xs mx-auto w-full mt-4">
                   <Progress
                     value={uploadingProgress}
+                    indicatorColor={uploadingProgress === 100 ? 'bg-green-500' : ''}
                     className="h-1 w-full bg-zinc-200"
                   />
+                  {uploadingProgress === 100 ? (
+                    <div className="flex justify-center items-center gap-1 text-sm text-center text-zinc-700 pt-2">
+                      <Loader2 className="h-3 w-3 animate-spin" />
+                      <span>Redirecting . . .</span>
+                    </div>
+                  ) : null}
                 </div>
               ) : null}
               <input
