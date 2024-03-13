@@ -1,8 +1,10 @@
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 import { router, publicProcedure, privateProcedure } from "./trpc";
 import { TRPCError } from "@trpc/server";
+import {UTApi} from 'uploadthing/server';
 import { z } from "zod";
 import { db } from "@/db";
+export const utapi = new UTApi();
 export const appRouter = router({
   authCallBack: publicProcedure.query(async () => {
     const { getUser } = getKindeServerSession(); //From kinde server
@@ -42,14 +44,8 @@ export const appRouter = router({
       const { userId } = ctx;
       const file = await db.file.findFirst({
         where: {
-          AND: [
-            {
-              id: input.id,
-            },
-            {
-              userId,
-            },
-          ],
+          id: input.id,
+          userId,
         },
       });
       if (!file) throw new TRPCError({ code: "NOT_FOUND" });
@@ -58,6 +54,7 @@ export const appRouter = router({
           id: input.id,
         },
       });
+      await utapi.deleteFiles(file.key); //Delete from -> uploadthing
       return {
         sucess: true,
       };

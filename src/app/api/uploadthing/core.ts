@@ -1,14 +1,12 @@
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 import { TRPCError } from "@trpc/server";
 import { createUploadthing, type FileRouter } from "uploadthing/next";
-import { UploadThingError } from "uploadthing/server";
 import { db } from "@/db";
 const f = createUploadthing();
 
-const auth = (req: Request) => ({ id: "fakeId" });
 
 export const ourFileRouter = {
-  pdfUpLoader: f({ image: { maxFileSize: "4MB" } })
+  pdfUpLoader: f({ pdf: { maxFileSize: "4MB" } })
     .middleware(async ({ req }) => {
       const { getUser } = getKindeServerSession();
       const user = await getUser();

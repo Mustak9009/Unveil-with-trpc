@@ -9,18 +9,20 @@ import { useUploadThing } from "@/lib/uploadthing";
 import { ToastAction } from "./ui/toast";
 import { toast } from "./ui/use-toast";
 import { trpc } from "@/trpc/client";
-import {useRouter} from 'next/navigation';
+import { useRouter } from "next/navigation";
 
 const UploadDropZone = () => {
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const [uploadingProgress, setUploadingProgress] = useState<number>(0);
   const { startUpload } = useUploadThing("pdfUpLoader");
   const router = useRouter();
-  const {mutate:startPolling} = trpc.getFile.useMutation({
-    onSuccess:(file)=>{
+  const { mutate: startPolling } = trpc.getFile.useMutation({ //Api polling
+    onSuccess: (file) => {
       router.push(`/admin/${file.id}`);
-    }
-  })
+    },
+    retry: true,
+    retryDelay: 500,
+  });
   const startSimulatedProgress = () => {
     const interval = setInterval(() => {
       setUploadingProgress((preProgress) => {
@@ -47,8 +49,7 @@ const UploadDropZone = () => {
         variant: "destructive",
       });
 
-    const [fileResponse] = res;
-    console.log(res);
+    const [fileResponse] = res; //convert arry to Obj
     const key = fileResponse.key;
     if (!key)
       return toast({
@@ -60,7 +61,7 @@ const UploadDropZone = () => {
 
     clearInterval(progressInterval);
     setUploadingProgress(100);
-    startPolling({key})
+    startPolling({ key });
   };
   return (
     <DropZone
@@ -103,7 +104,13 @@ const UploadDropZone = () => {
                   />
                 </div>
               ) : null}
-              <input {...getInputProps()} type="file" id="dropzone-file" className="hidden" accept="application/pdf"/>
+              <input
+                {...getInputProps()}
+                type="file"
+                id="dropzone-file"
+                className="hidden"
+                accept="application/pdf"
+              />
             </label>
           </div>
         </div>
