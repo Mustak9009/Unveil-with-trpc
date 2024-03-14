@@ -4,6 +4,7 @@ import { notFound, redirect } from "next/navigation";
 import PDFRenderer from "@/components/PDFRenderer.component";
 import ChatWrapper from "@/components/ChatWrapper.component";
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
+
 interface PageProps {
   params: {
     fileId: string;
@@ -28,7 +29,7 @@ export default async function page({ params }: PageProps) {
         {/* Left side */}
         <div className="flex-1 xl:flex">
           <div className="px-4 py-6 sm:px-6 lg:pl-8 xl:flex-1 xl:pl-6">
-            <PDFRenderer />
+            <PDFRenderer url={file.url}/>
           </div>
         </div>
         {/* Right side */}

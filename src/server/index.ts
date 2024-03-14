@@ -1,20 +1,24 @@
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 import { router, publicProcedure, privateProcedure } from "./trpc";
 import { TRPCError } from "@trpc/server";
-import {UTApi} from 'uploadthing/server';
+import { UTApi } from "uploadthing/server";
 import { z } from "zod";
 import { db } from "@/db";
 export const utapi = new UTApi();
+const getDbUser = async (email:string)=>{
+  const dbUser = await db.user.findUnique({
+    where: {
+      email: email,
+    },
+  });
+  return {dbUser,id:dbUser?.id}
+}
 export const appRouter = router({
   authCallBack: publicProcedure.query(async () => {
     const { getUser } = getKindeServerSession(); //From kinde server
     const user = await getUser();
     if (!user?.id || !user.email) throw new TRPCError({ code: "UNAUTHORIZED" });
-    const dbUser = await db.user.findFirst({
-      where: {
-        email: user.email,
-      },
-    });
+    const {dbUser} = await getDbUser(user.email);
 
     if (!dbUser) {
       await db.user.create({
@@ -28,9 +32,11 @@ export const appRouter = router({
   }),
   getUserFiles: privateProcedure.query(async ({ ctx }) => {
     const { user, userId } = ctx;
+    if (!user?.id || !user.email) throw new TRPCError({ code: "UNAUTHORIZED" });
+    const {id} = await getDbUser(user.email);
     return await db.file.findMany({
       where: {
-        userId,
+        userId:id,
       },
     });
   }),
@@ -41,11 +47,13 @@ export const appRouter = router({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      const { userId } = ctx;
+      const { user,userId } = ctx;
+      if (!user?.id || !user.email) throw new TRPCError({ code: "UNAUTHORIZED" });
+      const {id} = await getDbUser(user.email);
       const file = await db.file.findFirst({
         where: {
           id: input.id,
-          userId,
+          userId:id,
         },
       });
       if (!file) throw new TRPCError({ code: "NOT_FOUND" });
@@ -66,10 +74,12 @@ export const appRouter = router({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      const { userId } = ctx;
+      const { user, userId } = ctx;
+      if (!user?.id || !user.email) throw new TRPCError({ code: "UNAUTHORIZED" });
+      const {id} = await getDbUser(user.email);
       const file = await db.file.findFirst({
         where: {
-          userId,
+          userId:id,
           key: input.key,
         },
       });
