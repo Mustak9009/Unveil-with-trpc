@@ -2,21 +2,42 @@
 import { ChevronDown, ChevronUp, Loader2 } from "lucide-react";
 import React, { useState } from "react";
 import { Document, Page, pdfjs } from "react-pdf";
+import { useResizeDetector } from "react-resize-detector";
+
 import "react-pdf/dist/Page/AnnotationLayer.css";
 import "react-pdf/dist/Page/TextLayer.css";
+
 import { toast } from "./ui/use-toast";
-import { useResizeDetector } from "react-resize-detector";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 
+import {z} from 'zod';
+import {useForm} from 'react-hook-form';
+import {zodResolver} from '@hookform/resolvers/zod'
+
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
+
 interface PDFRendererProps {
   url: string;
 }
+
+
+
 export default function PDFRenderer({ url }: PDFRendererProps) {
   const { width, ref: ResizeREf } = useResizeDetector();
   const [numPages, setNumPages] = useState<number | null | undefined>(null);
   const [currentPage, setCurrentPage] = useState<number>(1);
+  const CustomPageValidator = z.object({
+    page:z.string().refine((page)=> Number(page) > 0 && Number(page) <= numPages!)
+  });
+  type CustomValidatorType = z.infer<typeof CustomPageValidator>
+  
+  const {register,handleSubmit,setValue,formState:{errors}} = useForm<CustomValidatorType>({
+    defaultValues:{
+      page:'1'
+    },
+    resolver:zodResolver(CustomPageValidator)
+  })
   return (
     <div className="w-full flex flex-col items-center shadow bg-white rounded-md">
       <div className="w-full h-14 border-b border-zinc-200 flex items-center justify-between px-2">
@@ -34,7 +55,7 @@ export default function PDFRenderer({ url }: PDFRendererProps) {
             <ChevronDown calcMode="w-4 h-4" />
           </Button>
           <div className="flex items-center gap-1.5">
-            <Input className="w-12 h-8 focus-visible:ring-transparent" />
+            <Input {...register('page')} className="w-12 h-8 focus-visible:ring-transparent" />
             <p className="text-sm text-zinc-700 space-x-1">
               <span>/</span>
               <span>{numPages ?? "X"}</span>
