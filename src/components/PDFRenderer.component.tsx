@@ -1,5 +1,5 @@
 "use client";
-import { ChevronDown, ChevronUp, Loader2, Search } from "lucide-react";
+import { ChevronDown, ChevronUp, Loader2, RotateCcw, Search } from "lucide-react";
 import React, { useState } from "react";
 import { Document, Page, pdfjs } from "react-pdf";
 import { useResizeDetector } from "react-resize-detector";
@@ -38,7 +38,8 @@ export default function PDFRenderer({ url }: PDFRendererProps) {
   const [numPages, setNumPages] = useState<number | null | undefined>(null);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [scale, setScale] = useState<number>(1);
-
+  const [rotation,setRotation]  = useState<number>(0);
+  console.log(rotation)
   const CustomPageValidator = z.object({
     page: z
       .string()
@@ -132,6 +133,9 @@ export default function PDFRenderer({ url }: PDFRendererProps) {
               </DropdownMenuGroup>
             </DropdownMenuContent>
           </DropdownMenu>
+          <Button onClick={()=>setRotation(prev=>prev + 90)} variant={'ghost'} aria-label="rotate 90 degrees">
+            <RotateCcw className="w-4 h-4"/>
+          </Button>
         </div>
       </div>
       <div className="w-full flex-1 max-h-screen">
@@ -158,6 +162,7 @@ export default function PDFRenderer({ url }: PDFRendererProps) {
                 width={width ? width : 1}
                 pageNumber={currentPage}
                 scale={scale}
+                rotate={rotation}
               />
             </Document>
           </div>
