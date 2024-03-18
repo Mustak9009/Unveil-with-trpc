@@ -1,11 +1,17 @@
 "use client";
-import { ChevronDown, ChevronUp, Loader2, RotateCcw, Search } from "lucide-react";
-import React, { useState } from "react";
+import {
+  ChevronDown,
+  ChevronUp,
+  Loader2,
+  RotateCcw,
+  Search,
+} from "lucide-react";
+import React, { useEffect, useState } from "react";
 import { Document, Page, pdfjs } from "react-pdf";
 import { useResizeDetector } from "react-resize-detector";
 
 import { cn } from "@/lib/utils";
-import SimpleBar from 'simplebar-react';
+import SimpleBar from "simplebar-react";
 import "react-pdf/dist/Page/AnnotationLayer.css";
 import "react-pdf/dist/Page/TextLayer.css";
 
@@ -25,6 +31,7 @@ import {
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import PDFFullScreen from "./PDFFullScreen.component";
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
 
@@ -38,8 +45,11 @@ export default function PDFRenderer({ url }: PDFRendererProps) {
   const [numPages, setNumPages] = useState<number | null | undefined>(null);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [scale, setScale] = useState<number>(1);
-  const [rotation,setRotation]  = useState<number>(0);
-  console.log(rotation)
+  const [rotation, setRotation] = useState<number>(0);
+  const [renderedScale, setRenderedScale] = useState<number | null>(null);
+
+  const isLoading = renderedScale !== scale;
+
   const CustomPageValidator = z.object({
     page: z
       .string()
@@ -47,26 +57,30 @@ export default function PDFRenderer({ url }: PDFRendererProps) {
   });
 
   type CustomValidatorType = z.infer<typeof CustomPageValidator>;
-  const {register,handleSubmit,setValue,formState: { errors }} = useForm<CustomValidatorType>({
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    formState: { errors },
+  } = useForm<CustomValidatorType>({
     defaultValues: {
       page: "1",
     },
     resolver: zodResolver(CustomPageValidator),
   });
-
   const handlePageSubmit = ({ page }: CustomValidatorType) => {
     setCurrentPage(Number(page));
-    setValue("page", String(page));
   };
+  useEffect(() => {
+    setValue("page", String(currentPage));
+  }, [currentPage, setValue]);
   return (
     <div className="w-full flex flex-col items-center shadow bg-white rounded-md">
-      <div className="w-full h-14 border-b border-zinc-200 flex items-center justify-between px-2">
-        <div className="flex items-center gap-1.5">
+      <div className="w-full h-full sm:h-14 border-b border-zinc-200 flex flex-col sm:flex-row sm:items-center sm:justify-between px-2">
+        <div className="flex items-center justify-end gap-1.5">
           <Button
             disabled={currentPage <= 1}
-            onClick={() =>
-              setCurrentPage((prev) => (prev - 1 > 1 ? prev - 1 : 1))
-            }
+            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))} //For pagination Math.max and .min is cool
             aria-label="previous page"
             variant={"ghost"}
           >
@@ -95,10 +109,8 @@ export default function PDFRenderer({ url }: PDFRendererProps) {
           <Button
             disabled={numPages === undefined || numPages! === currentPage}
             onClick={() =>
-              setCurrentPage((prev) =>
-                prev + 1 < numPages! ? prev + 1 : numPages!
-              )
-            }
+              setCurrentPage((prev) => Math.min(prev + 1, numPages ?? 1))
+            } //We set numPages ?? 1 -> as because numPages will be null or undefiend
             aria-label="previous page"
             variant={"ghost"}
           >
@@ -133,9 +145,14 @@ export default function PDFRenderer({ url }: PDFRendererProps) {
               </DropdownMenuGroup>
             </DropdownMenuContent>
           </DropdownMenu>
-          <Button onClick={()=>setRotation(prev=>prev + 90)} variant={'ghost'} aria-label="rotate 90 degrees">
-            <RotateCcw className="w-4 h-4"/>
+          <Button
+            onClick={() => setRotation((prev) => (prev + 90) % 360)}
+            variant={"ghost"}
+            aria-label="rotate 90 degrees"
+          >
+            <RotateCcw className="w-4 h-4" />
           </Button>
+          <PDFFullScreen fileURL={url} />
         </div>
       </div>
       <div className="w-full flex-1 max-h-screen">
@@ -158,12 +175,29 @@ export default function PDFRenderer({ url }: PDFRendererProps) {
               file={url}
               className={"max-h-full"}
             >
+              {isLoading && renderedScale ? (
+                <Page
+                  width={width ? width : 1}
+                  pageNumber={currentPage}
+                  scale={scale}
+                  rotate={rotation}
+                  key={'@' + renderedScale}
+                />
+              ) : null}
               <Page
-                width={width ? width : 1}
-                pageNumber={currentPage}
-                scale={scale}
-                rotate={rotation}
-              />
+                  className={cn(isLoading ? 'hidden' : '')}
+                  width={width ? width : 1}
+                  pageNumber={currentPage}
+                  scale={scale}
+                  key={'@' + scale}
+                  rotate={rotation}
+                  loading={
+                    <div className="flex justify-center">
+                      <Loader2 className="my-24 w-6 h-6 animate-spin"/>
+                    </div>
+                  }
+                  onRenderSuccess={()=>setRenderedScale(scale)}
+                />
             </Document>
           </div>
         </SimpleBar>
