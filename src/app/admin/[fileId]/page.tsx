@@ -2,7 +2,7 @@ import React from "react";
 import { db } from "@/db";
 import { notFound, redirect } from "next/navigation";
 import PDFRenderer from "@/components/PDFRenderer.component";
-import ChatWrapper from "@/components/ChatWrapper.component";
+import ChatWrapper from "@/components/chat/ChatWrapper.component";
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 
 interface PageProps {
@@ -34,7 +34,7 @@ export default async function page({ params }: PageProps) {
         </div>
         {/* Right side */}
         <div className="flex-[0.75] shrink-0 border-t lg:w-96 lg:border-l lg:border-t-0 border-gray-200">
-          <ChatWrapper/>
+          <ChatWrapper fileId={fileId}/>
         </div>
       </div>
     </div>

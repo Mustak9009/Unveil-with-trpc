@@ -5,20 +5,20 @@ import { UTApi } from "uploadthing/server";
 import { z } from "zod";
 import { db } from "@/db";
 export const utapi = new UTApi();
-const getDbUser = async (email:string)=>{
+const getDbUser = async (email: string) => {
   const dbUser = await db.user.findUnique({
     where: {
       email: email,
     },
   });
-  return {dbUser,id:dbUser?.id}
-}
+  return { dbUser, id: dbUser?.id };
+};
 export const appRouter = router({
   authCallBack: publicProcedure.query(async () => {
     const { getUser } = getKindeServerSession(); //From kinde server
     const user = await getUser();
     if (!user?.id || !user.email) throw new TRPCError({ code: "UNAUTHORIZED" });
-    const {dbUser} = await getDbUser(user.email);
+    const { dbUser } = await getDbUser(user.email);
 
     if (!dbUser) {
       await db.user.create({
@@ -27,16 +27,12 @@ export const appRouter = router({
         },
       });
     }
-
     return { success: true };
   }),
   getUserFiles: privateProcedure.query(async ({ ctx }) => {
-    const { user, userId } = ctx;
-    if (!user?.id || !user.email) throw new TRPCError({ code: "UNAUTHORIZED" });
-    const {id} = await getDbUser(user.email);
     return await db.file.findMany({
       where: {
-        userId:id,
+        userId: ctx.userId,
       },
     });
   }),
@@ -47,13 +43,10 @@ export const appRouter = router({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      const { user,userId } = ctx;
-      if (!user?.id || !user.email) throw new TRPCError({ code: "UNAUTHORIZED" });
-      const {id} = await getDbUser(user.email);
       const file = await db.file.findFirst({
         where: {
           id: input.id,
-          userId:id,
+          userId: ctx.userId,
         },
       });
       if (!file) throw new TRPCError({ code: "NOT_FOUND" });
@@ -74,17 +67,26 @@ export const appRouter = router({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      const { user, userId } = ctx;
-      if (!user?.id || !user.email) throw new TRPCError({ code: "UNAUTHORIZED" });
-      const {id} = await getDbUser(user.email);
       const file = await db.file.findFirst({
         where: {
-          userId:id,
+          userId: ctx.userId,
           key: input.key,
         },
       });
       if (!file) throw new TRPCError({ code: "NOT_FOUND" });
       return file;
+    }),
+  getFileUploadStatus: privateProcedure
+    .input(z.object({ fileId: z.string() }))
+    .query(async ({ ctx, input }) => {
+      const file = await db.file.findFirst({
+        where:{
+          id:input.fileId,
+          userId:ctx.userId
+        }
+      });
+      if(!file) return {status:'PENDING' as const};
+      return {status:file.uploadStatus}
     }),
 });
 

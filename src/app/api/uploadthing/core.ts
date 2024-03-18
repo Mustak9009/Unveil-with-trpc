@@ -27,7 +27,8 @@ export const ourFileRouter = {
           url:file.url,
           uploadStatus:'PROCESSING'
         }
-      })
+      });
+      
     }),
 } satisfies FileRouter;
 
