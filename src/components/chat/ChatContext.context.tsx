@@ -40,7 +40,7 @@ export const ChatContextProvider = ({fileId,children}:PropsType)=>{
 
     return(
         <ChatContext.Provider value={{addMessages,handleInputChanges,isLoading,message}}>
-
+            {children}
         </ChatContext.Provider>
     )
 
