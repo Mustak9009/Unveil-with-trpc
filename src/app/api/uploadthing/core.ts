@@ -1,7 +1,7 @@
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 import { TRPCError } from "@trpc/server";
 import { db } from "@/db";
-import { pinecone } from "@/lib/Pinecone";
+import { getPineconeClient } from "@/lib/Pinecone";
 import { createUploadthing, type FileRouter } from "uploadthing/next";
 import { PDFLoader } from "langchain/document_loaders/fs/pdf";
 import { OpenAIEmbeddings } from "@langchain/openai";
@@ -41,12 +41,14 @@ export const ourFileRouter = {
         const docs = await loader.load();
 
         //Vectorize and index entire document
+        const pinecone = await getPineconeClient();
         const pineconeIndex = pinecone.Index('unveil');
         const embeddings =  new OpenAIEmbeddings({
           openAIApiKey:process.env.OPENAI_API_KEY
         })
 
         await PineconeStore.fromDocuments(docs,embeddings,{
+          //@ts-ignore
           pineconeIndex,
           namespace:createFile.id
         });
