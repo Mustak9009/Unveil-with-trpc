@@ -1,7 +1,7 @@
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 import { TRPCError } from "@trpc/server";
 import { db } from "@/db";
-import { getPineconeClient } from "@/lib/Pinecone";
+import { pinecone } from "@/lib/Pinecone";
 import { createUploadthing, type FileRouter } from "uploadthing/next";
 import { PDFLoader } from "langchain/document_loaders/fs/pdf";
 import { OpenAIEmbeddings } from "@langchain/openai";
@@ -35,20 +35,20 @@ export const ourFileRouter = {
       });
       try{
         const res = await fetch(file.url);
-        const blob = await res.blob();
 
+        const blob = await res.blob();
         const loader = new PDFLoader(blob);
+
         const docs = await loader.load();
+        const pagesAMT = docs.length;
 
         //Vectorize and index entire document
-        const pinecone = await getPineconeClient();
         const pineconeIndex = pinecone.Index('unveil');
         const embeddings =  new OpenAIEmbeddings({
           openAIApiKey:process.env.OPENAI_API_KEY
         })
 
         await PineconeStore.fromDocuments(docs,embeddings,{
-          //@ts-ignore
           pineconeIndex,
           namespace:createFile.id
         });
@@ -62,6 +62,7 @@ export const ourFileRouter = {
           }
         })
       }catch(err){
+        console.log(err)
         await db.file.update({
           data:{
             uploadStatus:'FAILED'
