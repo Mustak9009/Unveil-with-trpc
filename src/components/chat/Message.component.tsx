@@ -39,7 +39,7 @@ export default function Message({message,isNextMessageFromSamePerson}: MessagePr
       >
         <div
           className={cn("px-4 py-2 rounded-lg inline-block", {
-            "bg-blue-600 text-white": message.isUserMessage,
+            "bg-gray-900 text-white": message.isUserMessage,
             "bg-gray-200 text-gray-900": !message.isUserMessage,
             "rounded-br-none":
               isNextMessageFromSamePerson && message.isUserMessage,
