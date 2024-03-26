@@ -8,8 +8,7 @@ type ChatInputPropsType = {
 };
 export default function ChatInput({ isDisabled }: ChatInputPropsType) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const { addMessages, handleInputChanges, isLoading, message } =
-    useContext(ChatContext);
+  const { addMessages, handleInputChanges, isLoading, message } = useContext(ChatContext);
   return (
     <div className="w-full absolute left-0 bottom-0">
       <form className="flex flex-row gap-3 mx-2 md:mx-4 md:last:mb-6 lg:mx-auto lg:max-w-2xl xl:max-w-3xl">
