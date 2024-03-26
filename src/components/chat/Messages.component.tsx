@@ -9,8 +9,7 @@ interface MessagesPropsType {
   fileId: string;
 }
 export default function Messages({ fileId }: MessagesPropsType) {
-  const { data, isLoading, fetchNextPage } =
-    trpc.getFileMessage.useInfiniteQuery(
+  const { data, isLoading, fetchNextPage } = trpc.getFileMessage.useInfiniteQuery(
       { fileId, limit: INFINITE_QUERY_LIMIT },
       {
         getNextPageParam: (lastData) => lastData.nextCursor,
@@ -31,17 +30,15 @@ export default function Messages({ fileId }: MessagesPropsType) {
     ...(true ? [loadingMessage] : []),
     ...(messages ?? []),
   ];
-
+  console.log(combineMessages)
   return (
     <div className="flex max-h-[calc(100vh-3.5rem-7rem)] border-zinc-200 flex-1 flex-col-reverse gap-4 p-3  overflow-y-auto  scrollbar-thumb-blue scrollbar-thumb-rounded scrollbar-track-blue-lighter">
       {combineMessages && combineMessages.length > 0 ? (
         combineMessages.map((message, i) => {
-          const isNextMessageFromSamePerson =
-            combineMessages[i].isUserMessage ===
-            combineMessages[i - 1].isUserMessage;
+          const isNextMessageFromSamePerson =  combineMessages[i - 1]?.isUserMessage === combineMessages[i]?.isUserMessage;
           if (i === combineMessages.length - 1) {
-            return <Message />;
-          } else return <Message />;
+            return <Message  key={message.id} {...{message,isNextMessageFromSamePerson}}/>;
+          } else return <Message key={message.id}  {...{message,isNextMessageFromSamePerson}}/>;
         })
       ) : isLoading ? (
         <div className="w-full flex flex-col gap-2">

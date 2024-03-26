@@ -5,6 +5,7 @@ import { UTApi } from "uploadthing/server";
 import { z } from "zod";
 import { db } from "@/db";
 import { INFINITE_QUERY_LIMIT } from "@/config/infinite-query.config";
+import {ObjectId} from 'bson'
 export const utapi = new UTApi();
 const getDbUser = async (email: string) => {
   const dbUser = await db.user.findUnique({
@@ -98,10 +99,12 @@ export const appRouter = router({
       })
     )
     .query(async({ctx,input}) => {
-      const {userId} = ctx;
-      const {fileId,cursor} = input;
+      const {userId:userIdCtx} = ctx;
+      const {fileId:fileIdInput,cursor} = input;
       const limit = input.limit ?? INFINITE_QUERY_LIMIT; 
-
+      
+      const userId = new ObjectId(userIdCtx).toString();
+      const fileId = new ObjectId(fileIdInput).toString();
       const file = await db.file.findFirst({
         where:{
           id:fileId,
