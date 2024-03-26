@@ -4,7 +4,7 @@ import { TRPCError } from "@trpc/server";
 import { UTApi } from "uploadthing/server";
 import { z } from "zod";
 import { db } from "@/db";
-import { INFINITE_QUERY_CONFIG } from "@/config/infinite-query.config";
+import { INFINITE_QUERY_LIMIT } from "@/config/infinite-query.config";
 export const utapi = new UTApi();
 const getDbUser = async (email: string) => {
   const dbUser = await db.user.findUnique({
@@ -100,7 +100,7 @@ export const appRouter = router({
     .query(async({ctx,input}) => {
       const {userId} = ctx;
       const {fileId,cursor} = input;
-      const limit = input.limit ?? INFINITE_QUERY_CONFIG; 
+      const limit = input.limit ?? INFINITE_QUERY_LIMIT; 
 
       const file = await db.file.findFirst({
         where:{
