@@ -90,7 +90,7 @@ export const appRouter = router({
       if (!file) return { status: "PENDING" as const };
       return { status: file.uploadStatus };
     }),
-  getFileMessage: privateProcedure
+  getFileMessages: privateProcedure
     .input(
       z.object({
         limit: z.number().min(1).max(100).nullish(),

@@ -19,8 +19,8 @@ export default function Message({message,isNextMessageFromSamePerson}: MessagePr
         className={cn(
           "relative flex justify-center items-center h-6 w-6 aspect-square",
           {
-            "order-2 bg-blue-600 rounded-sm": message.isUserMessage,
-            "order-1 bg-gray-800 rounded-sm": !message.isUserMessage,
+            "order-2  bg-gray-800 rounded-sm": message.isUserMessage,
+            "order-1  bg-gray-800 rounded-sm": !message.isUserMessage,
             invisible: isNextMessageFromSamePerson,
           }
         )}
