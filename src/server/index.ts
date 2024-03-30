@@ -5,7 +5,10 @@ import { UTApi } from "uploadthing/server";
 import { z } from "zod";
 import { db } from "@/db";
 import { INFINITE_QUERY_LIMIT } from "@/config/infinite-query.config";
-import {ObjectId} from 'bson'
+import { ObjectId } from "bson";
+import { absolutePath } from "@/lib/utils";
+import { getUserSubscriptionPlan, stripe } from "@/lib/stripe.lib";
+import { PLANS } from "@/config/stripe.config";
 export const utapi = new UTApi();
 const getDbUser = async (email: string) => {
   const dbUser = await db.user.findUnique({
@@ -98,48 +101,93 @@ export const appRouter = router({
         fileId: z.string(),
       })
     )
-    .query(async({ctx,input}) => {
-      const {userId:userIdCtx} = ctx;
-      const {fileId:fileIdInput,cursor} = input;
-      const limit = input.limit ?? INFINITE_QUERY_LIMIT; 
-      
+    .query(async ({ ctx, input }) => {
+      const { userId: userIdCtx } = ctx;
+      const { fileId: fileIdInput, cursor } = input;
+      const limit = input.limit ?? INFINITE_QUERY_LIMIT;
+
       const userId = new ObjectId(userIdCtx).toString();
       const fileId = new ObjectId(fileIdInput).toString();
       const file = await db.file.findFirst({
-        where:{
-          id:fileId,
-          userId
-        }
+        where: {
+          id: fileId,
+          userId,
+        },
       });
-      if(!file) throw new TRPCError({code:'NOT_FOUND'});
+      if (!file) throw new TRPCError({ code: "NOT_FOUND" });
 
       const messages = await db.message.findMany({
-        take:limit + 1, // + 1 for database call
-        where:{
-          fileId
+        take: limit + 1, // + 1 for database call
+        where: {
+          fileId,
         },
-        orderBy:{
-          createdAt:'desc'
+        orderBy: {
+          createdAt: "desc",
         },
-        cursor:cursor ? {id:cursor} : undefined,
-        select:{
-          id:true,
-          text:true,
-          isUserMessage:true,
-          createdAt:true
-        }
+        cursor: cursor ? { id: cursor } : undefined,
+        select: {
+          id: true,
+          text: true,
+          isUserMessage: true,
+          createdAt: true,
+        },
       });
       let nextCursor: typeof cursor | undefined = undefined;
 
-      if(messages.length > limit){
+      if (messages.length > limit) {
         const nextItem = messages.pop(); //Remove `+ 1` obj
-        nextCursor = nextItem?.id
+        nextCursor = nextItem?.id;
       }
-      return{
+      return {
         messages,
-        nextCursor 
-      }
+        nextCursor,
+      };
     }),
+  createStripeSeesion: privateProcedure.mutation(async ({ ctx }) => {
+    const { userId } = ctx;
+    const billingURL = absolutePath("/admin/billing");
+
+    if (!userId) throw new TRPCError({ code: "UNAUTHORIZED" });
+
+    const dbUser = await db.user.findFirst({
+      where: {
+        id: userId,
+      },
+    });
+    if (!dbUser) throw new TRPCError({ code: "UNAUTHORIZED" });
+
+    const subscriptionPlan = await getUserSubscriptionPlan();
+    if (subscriptionPlan.isSubscribed && dbUser.stripeCustomerId) {
+      //If already a cutomer
+      const stripeSession = await stripe.billingPortal.sessions.create({
+        customer: dbUser.stripeCustomerId,
+        return_url: billingURL,
+      });
+      return {
+        url: stripeSession.url,
+      };
+    }
+
+    const stripeSession = await stripe.checkout.sessions.create({
+      success_url: billingURL,
+      cancel_url: billingURL,
+      payment_method_types: ["card", "paypal", "swish"],
+      mode: "subscription",
+      billing_address_collection: "auto",
+      line_items: [
+        {
+          price: PLANS.find((plan) => plan.name === "Pro")?.price.priceIds.test,
+          quantity: 1,
+        },
+      ],
+      metadata: {
+        userId,
+      },
+    });
+    return {
+      url: stripeSession.url,
+    };
+  }),
 });
 
 export type AppRouter = typeof appRouter;
