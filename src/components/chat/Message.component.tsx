@@ -1,4 +1,4 @@
-import React from "react";
+import React, { forwardRef } from "react";
 import { ExtendedMessage } from "@/types/messages.types";
 import { cn } from "@/lib/utils";
 import { Icons } from "../Icons.component";
@@ -8,12 +8,13 @@ interface MessagePropsType {
   message: ExtendedMessage;
   isNextMessageFromSamePerson: boolean;
 }
-export default function Message({message,isNextMessageFromSamePerson}: MessagePropsType) {
+export default forwardRef<HTMLDivElement, MessagePropsType>(function Message({ message, isNextMessageFromSamePerson },ref) {
   return (
     <div
       className={cn("flex items-end", {
         "justify-end": message.isUserMessage,
       })}
+      ref={ref}
     >
       <div
         className={cn(
@@ -72,4 +73,4 @@ export default function Message({message,isNextMessageFromSamePerson}: MessagePr
       </div>
     </div>
   );
-}
+});
