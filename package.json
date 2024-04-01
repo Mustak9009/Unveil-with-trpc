@@ -29,7 +29,6 @@
     "@trpc/server": "^11.0.0-next-beta.305",
     "@uploadthing/react": "^6.3.4",
     "ai": "^3.0.13",
-    "bson": "^6.5.0",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.0",
     "date-fns": "^3.3.1",

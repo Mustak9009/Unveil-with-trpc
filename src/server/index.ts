@@ -5,7 +5,6 @@ import { UTApi } from "uploadthing/server";
 import { z } from "zod";
 import { db } from "@/db";
 import { INFINITE_QUERY_LIMIT } from "@/config/infinite-query.config";
-import { ObjectId } from "bson";
 import { absolutePath } from "@/lib/utils";
 import { getUserSubscriptionPlan, stripe } from "@/lib/stripe.lib";
 import { PLANS } from "@/config/stripe.config";
@@ -102,12 +101,11 @@ export const appRouter = router({
       })
     )
     .query(async ({ ctx, input }) => {
-      const { userId: userIdCtx } = ctx;
-      const { fileId: fileIdInput, cursor } = input;
+      const { userId} = ctx;
+      const { fileId, cursor } = input;
       const limit = input.limit ?? INFINITE_QUERY_LIMIT;
 
-      const userId = new ObjectId(userIdCtx).toString();
-      const fileId = new ObjectId(fileIdInput).toString();
+
       const file = await db.file.findFirst({
         where: {
           id: fileId,
@@ -171,7 +169,7 @@ export const appRouter = router({
     const stripeSession = await stripe.checkout.sessions.create({
       success_url: billingURL,
       cancel_url: billingURL,
-      payment_method_types: ["card", "paypal", "swish"],
+      payment_method_types: ["card"],
       mode: "subscription",
       billing_address_collection: "auto",
       line_items: [

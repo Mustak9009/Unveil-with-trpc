@@ -83,8 +83,7 @@ export default async function page() {
         <TooltipProvider>
           {pricingItems.map(({ plan, tagline, quota, features }) => {
             const price =
-              PLANS.find((p) => p.slug === plan.toLowerCase())?.price.amount ||
-              0;
+              PLANS.find((p) => p.slug === plan.toLowerCase())?.price.amount || 0;
 
             return (
               <div
@@ -104,7 +103,7 @@ export default async function page() {
                     {plan}
                   </h3>
                   <p className="text-gray-500">{tagline}</p>
-                  <p className="text-6xl font-semibold my-5">${price}</p>
+                  <p className="text-6xl font-semibold my-5">₹{price}</p>
                   <p className="text-gray-500">Per month</p>
                   <div className="flex h-20 items-center justify-center border-b border-t border-gray-200 bg-gray-50">
                     <div className="flex items-center space-x-1">
