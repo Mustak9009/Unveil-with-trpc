@@ -143,7 +143,7 @@ export const appRouter = router({
     }),
   createStripeSeesion: privateProcedure.mutation(async ({ ctx }) => {
     const { userId } = ctx;
-    const billingURL = absolutePath("/admin/billing");
+    const billingURL =  absolutePath("/admin/billing");
 
     if (!userId) throw new TRPCError({ code: "UNAUTHORIZED" });
 

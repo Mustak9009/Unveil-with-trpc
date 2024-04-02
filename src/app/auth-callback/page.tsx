@@ -3,7 +3,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import {trpc} from '@/trpc/client';
 import { Loader2 } from "lucide-react";
 import { useEffect } from "react";
-export default  function page() {
+export default  function Page() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const origin = searchParams.get('origin')
@@ -15,7 +15,7 @@ export default  function page() {
     if(data?.success){
       router.push(origin ? `/${origin}` : '/admin')
     }
-  },[data,error,router])
+  },[data,error,router,origin])
   return(
     <div className="w-full mt-24 flex justify-center">
       <div className="flex flex-col items-center gap-2 ">
