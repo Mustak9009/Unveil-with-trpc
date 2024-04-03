@@ -4,6 +4,7 @@ import {LoginLink, RegisterLink,getKindeServerSession} from '@kinde-oss/kinde-au
 import { buttonVariants } from "./ui/button";
 import { ArrowRight } from "lucide-react";
 import UserAccountNav from "./UserAccountNav.component";
+import MobileNav from "./MobileNav.component";
 export default async function NavBar() {
   const {getUser} = getKindeServerSession();
   const user = await getUser();
@@ -14,7 +15,7 @@ export default async function NavBar() {
           <Link href={'/'} className="flex font-semibold z-40 text-xl sm:text-2xl">
             <span>Unveil.</span>
           </Link>
-          {/* TODO: Add navBar for mobo */}
+          <MobileNav isAuth={!!user}/> {/* !! -> It's a way of casting a "truthy" or "falsy" value to true or false, respectively. */}
           <div className="hidden sm:flex items-center space-x-4">
            {!user ? (
               <>
