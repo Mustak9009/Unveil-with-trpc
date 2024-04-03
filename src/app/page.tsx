@@ -29,7 +29,7 @@ export default function Home() {
             upload your file and start asking questions right away.
           </p>
         </section>
-        <Link href={"/dashboard"} target="_blank" className={buttonVariants({ size: "lg", className: "mt-5" })}>
+        <Link href={"/admin"} target="_blank" className={buttonVariants({ size: "lg", className: "mt-5" })}>
           Get started <ArrowRight className="ml-2 size-5" />
         </Link>
       </MaxWidthWrapper>

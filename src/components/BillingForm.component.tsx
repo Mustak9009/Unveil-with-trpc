@@ -50,6 +50,7 @@ export default function BillingForm({subscriptionPlan}: BillingFormPropsType) {
             {subscriptionPlan.isCanceled ? (
               <p className="rounded-full font-medium text-xs">
                 {subscriptionPlan.isCanceled ? 'Your plan will be canceled on' : 'Your plan renews on'}
+                {' '}
                 {format(subscriptionPlan.stripeCurrentPeriodEnd!,'dd.mm.yyyy')}
               </p>
             ) : null}
