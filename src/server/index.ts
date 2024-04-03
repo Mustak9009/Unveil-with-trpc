@@ -179,7 +179,7 @@ export const appRouter = router({
         },
       ],
       metadata: {
-        userId,
+        userId:userId,
       },
     });
     return {

@@ -34,7 +34,6 @@ export async function POST(request: Request) {
     const subscription = await stripe.subscriptions.retrieve(
       session.subscription as string
     );
-    console.log(subscription);
     await db.user.update({
       where: {
         id: session.metadata.userId,
@@ -42,7 +41,7 @@ export async function POST(request: Request) {
       data: {
         stripeSubscriptionId: subscription.id,
         stripeCustomerId: subscription.customer as string,
-        stripePriceId: subscription.items.data[0].price.id,
+        stripePriceId: subscription.items.data[0]?.price.id,
         stripeCurrentPeriodEnd: new Date(
           subscription.current_period_end * 1000
         ),
@@ -55,13 +54,12 @@ export async function POST(request: Request) {
     const subscription = await stripe.subscriptions.retrieve(
       session.subscription as string
     );
-
     await db.user.update({
       where: {
-        id: session.metadata.userId,
+        stripeSubscriptionId: subscription.id,
       },
       data: {
-        stripePriceId: subscription.items.data[0].price.id,
+        stripePriceId: subscription.items.data[0]?.price.id,
         stripeCurrentPeriodEnd: new Date(
           subscription.current_period_end * 1000
         ),
