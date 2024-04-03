@@ -2,6 +2,7 @@ import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 import { redirect } from "next/navigation";
 import Dashboard from "@/components/Dashboard.component";
 import { db } from "@/db";
+import { getUserSubscriptionPlan } from "@/lib/stripe.lib";
 export default async function page() {
   const { getUser } = getKindeServerSession();
   const user = await getUser();
@@ -13,5 +14,6 @@ export default async function page() {
     },
   });
   if (!dbuser) redirect("/auth-callback?origin=admin");
-  return <Dashboard />;
+  const subscriptionPlan = await getUserSubscriptionPlan();
+  return <Dashboard subscriptionPlan={subscriptionPlan}/>;
 }
