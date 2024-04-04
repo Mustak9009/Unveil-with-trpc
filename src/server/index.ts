@@ -167,9 +167,10 @@ export const appRouter = router({
     }
 
     const stripeSession = await stripe.checkout.sessions.create({
-      success_url:billingURL,
-      cancel_url: billingURL,
+      success_url:'https://unveil-tau.vercel.app/admin/billing',
+      cancel_url: 'https://unveil-tau.vercel.app/admin/billing',
       payment_method_types: ["card"],
+      
       mode: "subscription",
       billing_address_collection: "auto",
       line_items: [
