@@ -156,10 +156,9 @@ export const appRouter = router({
 
     const subscriptionPlan = await getUserSubscriptionPlan();
     if (subscriptionPlan.isSubscribed && dbUser.stripeCustomerId) {
-      //If already a cutomer
       const stripeSession = await stripe.billingPortal.sessions.create({
         customer: dbUser.stripeCustomerId,
-        return_url: billingURL,
+        return_url: 'https://unveil-tau.vercel.app/admin/billing',
       });
       return {
         url: stripeSession.url,
