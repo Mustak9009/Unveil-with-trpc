@@ -45,7 +45,7 @@ export function constructMetadata({
       creator: "@mustak"
     },
     icons,
-    metadataBase: new URL('https://unveil-khaki.vercel.app/'),
+    metadataBase: new URL('https://unveil-tau.vercel.app/'),
     ...(noIndex && {
       robots: {
         index: false,
